@@ -1,0 +1,79 @@
+# Render Blueprint for the Dual Code Auditor n8n backend.
+# Free web service (Docker image) + free managed Postgres so credentials survive restarts.
+# Deploy: Render dashboard -> New -> Blueprint -> connect this repo -> Apply.
+# You will be prompted for the GROQ_API_KEY secret during Apply.
+#
+# NOTE: Render free Postgres expires ~30 days after creation. Fine for the
+# submission window; to make it permanent later, swap DB_* to a Neon/Supabase DB.
+
+databases:
+  - name: n8n-db
+    plan: free
+    databaseName: n8n
+    user: n8n
+
+services:
+  - type: web
+    name: dual-code-auditor-n8n
+    runtime: image
+    image:
+      url: docker.io/n8nio/n8n:latest
+    plan: free
+    region: frankfurt
+    healthCheckPath: /healthz
+    envVars:
+      # --- Database (auto-wired from the managed Postgres above) ---
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_HOST
+        fromDatabase: { name: n8n-db, property: host }
+      - key: DB_POSTGRESDB_PORT
+        fromDatabase: { name: n8n-db, property: port }
+      - key: DB_POSTGRESDB_DATABASE
+        fromDatabase: { name: n8n-db, property: database }
+      - key: DB_POSTGRESDB_USER
+        fromDatabase: { name: n8n-db, property: user }
+      - key: DB_POSTGRESDB_PASSWORD
+        fromDatabase: { name: n8n-db, property: password }
+      - key: DB_POSTGRESDB_SSL_ENABLED
+        value: "true"
+      - key: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
+        value: "false"
+
+      # --- Public URL / networking ---
+      # If Render appends a suffix because the name is taken, update the three
+      # URLs below to match the real *.onrender.com hostname.
+      - key: N8N_HOST
+        value: dual-code-auditor-n8n.onrender.com
+      - key: N8N_PROTOCOL
+        value: https
+      - key: N8N_PORT
+        value: "5678"
+      - key: N8N_LISTEN_ADDRESS
+        value: "0.0.0.0"
+      - key: WEBHOOK_URL
+        value: https://dual-code-auditor-n8n.onrender.com/
+      - key: N8N_EDITOR_BASE_URL
+        value: https://dual-code-auditor-n8n.onrender.com/
+
+      # --- Persistence of encrypted credentials across restarts ---
+      - key: N8N_ENCRYPTION_KEY
+        generateValue: true
+
+      # --- Gotchas that silently break the workflow (proven required) ---
+      - key: NODE_FUNCTION_ALLOW_BUILTIN
+        value: crypto
+      - key: N8N_BLOCK_ENV_ACCESS_IN_NODE
+        value: "false"
+
+      # --- Misc ---
+      - key: GENERIC_TIMEZONE
+        value: Asia/Jerusalem
+      - key: N8N_SECURE_COOKIE
+        value: "true"
+      - key: N8N_DIAGNOSTICS_ENABLED
+        value: "false"
+
+      # --- Secret: paste your Groq API key in the Render dashboard on Apply ---
+      - key: GROQ_API_KEY
+        sync: false
