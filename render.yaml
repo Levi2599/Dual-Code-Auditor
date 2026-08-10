@@ -15,7 +15,7 @@ databases:
 
 services:
   - type: web
-    name: dual-code-auditor-n8n
+    name: dual-code-auditor-n8n-oregon
     runtime: image
     image:
       url: docker.io/n8nio/n8n:latest
@@ -45,7 +45,7 @@ services:
       # If Render appends a suffix because the name is taken, update the three
       # URLs below to match the real *.onrender.com hostname.
       - key: N8N_HOST
-        value: dual-code-auditor-n8n.onrender.com
+        value: dual-code-auditor-n8n-oregon.onrender.com
       - key: N8N_PROTOCOL
         value: https
       - key: N8N_PORT
@@ -53,9 +53,9 @@ services:
       - key: N8N_LISTEN_ADDRESS
         value: "0.0.0.0"
       - key: WEBHOOK_URL
-        value: https://dual-code-auditor-n8n.onrender.com/
+        value: https://dual-code-auditor-n8n-oregon.onrender.com/
       - key: N8N_EDITOR_BASE_URL
-        value: https://dual-code-auditor-n8n.onrender.com/
+        value: https://dual-code-auditor-n8n-oregon.onrender.com/
 
       # --- Persistence of encrypted credentials across restarts ---
       - key: N8N_ENCRYPTION_KEY
