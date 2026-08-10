@@ -7,9 +7,9 @@
 # submission window; to make it permanent later, swap DB_* to a Neon/Supabase DB.
 
 databases:
-  - name: n8n-db-frankfurt
+  - name: n8n-db
     plan: free
-    region: frankfurt
+    region: oregon
     databaseName: n8n
     user: n8n
 
@@ -20,22 +20,22 @@ services:
     image:
       url: docker.io/n8nio/n8n:latest
     plan: free
-    region: frankfurt
+    region: oregon
     healthCheckPath: /healthz
     envVars:
       # --- Database (auto-wired from the managed Postgres above) ---
       - key: DB_TYPE
         value: postgresdb
       - key: DB_POSTGRESDB_HOST
-        fromDatabase: { name: n8n-db-frankfurt, property: host }
+        fromDatabase: { name: n8n-db, property: host }
       - key: DB_POSTGRESDB_PORT
-        fromDatabase: { name: n8n-db-frankfurt, property: port }
+        fromDatabase: { name: n8n-db, property: port }
       - key: DB_POSTGRESDB_DATABASE
-        fromDatabase: { name: n8n-db-frankfurt, property: database }
+        fromDatabase: { name: n8n-db, property: database }
       - key: DB_POSTGRESDB_USER
-        fromDatabase: { name: n8n-db-frankfurt, property: user }
+        fromDatabase: { name: n8n-db, property: user }
       - key: DB_POSTGRESDB_PASSWORD
-        fromDatabase: { name: n8n-db-frankfurt, property: password }
+        fromDatabase: { name: n8n-db, property: password }
       - key: DB_POSTGRESDB_SSL_ENABLED
         value: "true"
       - key: DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED
